@@ -241,7 +241,7 @@ if st.session_state.cars:
             lines.append(f"{p}{member_dict[p]['suffix']}")
         lines.append("")
 
-       line_text = "\n".join(lines)
+    line_text = "\n".join(lines)
     copy_button(line_text, "LINE用テキストをコピー", key="copy_line")
     st.code(line_text, language=None)
 
