@@ -6,6 +6,7 @@ from urllib.parse import quote
 import pandas as pd
 import streamlit as st
 import json
+import streamlit.components.v1 as components
 
 st.title("車割自動作成")
 
