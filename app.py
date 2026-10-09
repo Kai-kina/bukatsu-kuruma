@@ -8,6 +8,44 @@ import streamlit as st
 
 st.title("車割自動作成")
 
+def copy_button(text: str, label: str, key: str):
+    """ワンタップでクリップボードにコピーするボタン"""
+    payload = json.dumps(text)
+    components.html(
+        f"""
+        <button id="b" style="width:100%;padding:14px;font-size:16px;border:none;
+                border-radius:8px;background:#ff4b4b;color:#fff;cursor:pointer;">
+            📋 {label}
+        </button>
+        <script>
+        const text = {payload};
+        const btn = document.getElementById("b");
+        const label = btn.innerText;
+        function done() {{
+            btn.innerText = "✅ コピーしました";
+            setTimeout(() => btn.innerText = label, 1500);
+        }}
+        function fallback() {{
+            const ta = document.createElement("textarea");
+            ta.value = text;
+            document.body.appendChild(ta);
+            ta.select();
+            document.execCommand("copy");
+            document.body.removeChild(ta);
+            done();
+        }}
+        btn.addEventListener("click", () => {{
+            if (navigator.clipboard && navigator.clipboard.writeText) {{
+                navigator.clipboard.writeText(text).then(done).catch(fallback);
+            }} else {{
+                fallback();
+            }}
+        }});
+        </script>
+        """,
+        height=60,
+    )
+
 # ==========================================
 # 1. Googleスプレッドシート連携設定
 # ==========================================
@@ -203,12 +241,9 @@ if st.session_state.cars:
             lines.append(f"{p}{member_dict[p]['suffix']}")
         lines.append("")
 
-    st.text_area(
-        "以下のテキストをコピーしてLINEに貼り付けてください",
-        value="\n".join(lines),
-        height=200,
-        key="line_text",
-    )
+       line_text = "\n".join(lines)
+    copy_button(line_text, "LINE用テキストをコピー", key="copy_line")
+    st.code(line_text, language=None)
 
     # 過去履歴追加用テキスト
     st.subheader("4. 過去履歴への自動加算")
@@ -226,9 +261,7 @@ if st.session_state.cars:
         "今回の車割りを反映した最新の履歴一覧です。"
         "必要に応じてスプレッドシートの 'history' シート全体に上書き貼り付けしてください。"
     )
-    st.text_area(
-        "最新の history シート用データ（全選択して上書き用）",
-        value="\n".join(tsv_lines),
-        height=200,
-        key="history_text",
-    )
+    history_text = "\n".join(tsv_lines)
+    copy_button(history_text, "history用データをコピー", key="copy_history")
+    with st.expander("内容を確認する"):
+        st.code(history_text, language=None)
