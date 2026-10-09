@@ -226,3 +226,4 @@ if st.session_state.cars:
         value="\n".join(tsv_lines),
         height=200,
         key="history_text",
+    )
