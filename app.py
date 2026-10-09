@@ -170,13 +170,16 @@ if st.session_state.cars:
     # ドライバー以外かつ現在参加者のみ選択肢にする
     pass_options = [n for n in selected_names if n not in driver_names]
 
-    updated_cars[driver] = st.pills(
-    f"{driver}カーの乗員を調整",
-    options=pass_options,
-    selection_mode="multi",
-    default=[p for p in passengers if p in pass_options],
-    key=f"car_{driver}",
-) or []
+    updated_cars = {}
+    for driver, passengers in st.session_state.cars.items():   
+        st.write(f"**【{driver}カー】**（定員 {member_dict[driver]['capacity']}人）")
+        updated_cars[driver] = st.pills(
+            f"{driver}カーの乗員を調整",
+            options=pass_options,
+            selection_mode="multi",
+            default=[p for p in passengers if p in pass_options],
+            key=f"car_{driver}",
+        ) or []
 
 
     # 整合性チェック
