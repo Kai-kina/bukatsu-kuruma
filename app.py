@@ -85,11 +85,14 @@ if st.button("🔄 スプレッドシートの最新データを再読み込み"
 # 2. 条件入力パート
 # ==========================================
 st.subheader("1. 本日の参加者選択")
-selected_names = st.multiselect(
-    "本日参加するメンバーを選んでください",
-    options=[m["name"] for m in ALL_MEMBERS],
-    default=[m["name"] for m in ALL_MEMBERS],
-)
+all_names = [m["name"] for m in ALL_MEMBERS]
+selected_names = st.pills(
+    "本日参加するメンバー(タップで切り替え)",
+    options=all_names,
+    selection_mode="multi",
+    default=all_names,
+) or []
+
 
 dep_time = st.text_input("出発時刻", value="16:25発")
 
@@ -167,15 +170,14 @@ if st.session_state.cars:
     # ドライバー以外かつ現在参加者のみ選択肢にする
     pass_options = [n for n in selected_names if n not in driver_names]
 
-    updated_cars = {}
-    for driver, passengers in st.session_state.cars.items():
-        st.write(f"**【{driver}カー】**（定員 {member_dict[driver]['capacity']}人）")
-        updated_cars[driver] = st.multiselect(
-            f"{driver}カーの乗員を調整",
-            options=pass_options,
-            default=[p for p in passengers if p in pass_options],
-            key=f"car_{driver}",
-        )
+    updated_cars[driver] = st.pills(
+    f"{driver}カーの乗員を調整",
+    options=pass_options,
+    selection_mode="multi",
+    default=[p for p in passengers if p in pass_options],
+    key=f"car_{driver}",
+) or []
+
 
     # 整合性チェック
     assigned = [p for ps in updated_cars.values() for p in ps]
